@@ -2,7 +2,8 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 3001;
 
-app.get("/", (req, res) => res.type('html').send(html));
+//app.get("/", (req, res) => res.type('html').send(html));
+
 
 const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
@@ -11,7 +12,7 @@ const html = `
 <html>
     <head>
     <title>Hello from Render!</title>
-    </heady>
+    </head>
 </html>
 `
 
@@ -23,10 +24,37 @@ const client = new Client({
     authStrategy: new NoAuth()
 });
  
+var QRCode = require('qrcode');
+
+
+
+var string1 = "";
+// client.on('qr', qr => {
+//     console.log('QR RECEIVED', qr);
+//     qrcode.generate(qr, {small: true}, function(qr){
+//         console.log(qr)
+//         string1 = '<h1>' + JSON.stringify(qr) + '</h1>';
+//     });
+// });
+
+
 
 client.on('qr', qr => {
-    qrcode.generate(qr, {small: true});
+    QRCode.toDataURL(qr, function (err, url) {
+        if (err) console.log('error: ' + err)
+        string1="<!DOCTYPE html/><html><head><title>node-qrcode</title></head><body><img src='" + url + "'/></body></html>";
+        console.log("printing",string1)
+        app.get("/", (req, res) => res.type('html').send(string1));
+        console.log("send")
+      })
+      console.log(string1)
+    
 });
+
+
+app.get('/', (req, res) => {
+    res.send(string1)
+})
 
 client.on('ready', () => {
     console.log('Client is ready!');
